@@ -6,10 +6,11 @@
   <title>Law RAG — 法律智能问答系统</title>
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
   <style>
-    :root { 
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; 
+    :root {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
       color: #2c3e50;
       --primary-color: #3498db;
+      --primary-dark: #2980b9;
       --secondary-color: #2c3e50;
       --success-color: #27ae60;
       --warning-color: #f39c12;
@@ -17,14 +18,15 @@
       --light-bg: #f8f9fa;
       --border-color: #dee2e6;
       --card-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
     }
-    
+
     * {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
     }
-    
+
     body {
       background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
       min-height: 100vh;
@@ -32,54 +34,61 @@
       font-size: 16px;
       line-height: 1.6;
     }
-    
+
     .container {
       max-width: 900px;
       margin: 0 auto;
     }
-    
+
     .card {
       background: white;
       border-radius: 16px;
       padding: 30px;
       box-shadow: var(--card-shadow);
       margin: 20px 0;
-      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      transition: var(--transition);
     }
-    
+
     .card:hover {
       transform: translateY(-2px);
       box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
     }
-    
+
     .header {
       text-align: center;
       margin-bottom: 30px;
     }
-    
+
     .header h1 {
       color: var(--secondary-color);
       font-size: 28px;
       margin-bottom: 10px;
       font-weight: 600;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
     }
-    
+
     .header p {
       color: #7f8c8d;
       font-size: 16px;
     }
-    
+
     .input-group {
       margin-bottom: 20px;
     }
-    
+
     label {
       display: block;
       margin-bottom: 8px;
       font-weight: 500;
       color: var(--secondary-color);
+      display: flex;
+      align-items: center;
+      gap: 8px;
     }
-    
+
     textarea {
       width: 100%;
       min-height: 120px;
@@ -88,15 +97,15 @@
       border: 2px solid var(--border-color);
       border-radius: 10px;
       resize: vertical;
-      transition: border-color 0.2s ease;
+      transition: var(--transition);
     }
-    
+
     textarea:focus {
       outline: none;
       border-color: var(--primary-color);
       box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
     }
-    
+
     .controls {
       display: flex;
       flex-wrap: wrap;
@@ -107,39 +116,39 @@
       background: var(--light-bg);
       border-radius: 10px;
     }
-    
+
     .control-item {
       display: flex;
       flex-direction: column;
       gap: 5px;
     }
-    
+
     .control-item label {
       margin-bottom: 0;
       font-size: 14px;
       color: #666;
     }
-    
+
     select, button {
       padding: 12px 16px;
       font-size: 15px;
       border-radius: 8px;
       border: none;
       cursor: pointer;
-      transition: all 0.2s ease;
+      transition: var(--transition);
     }
-    
+
     select {
       background: white;
       border: 2px solid var(--border-color);
       min-width: 80px;
     }
-    
+
     select:focus {
       outline: none;
       border-color: var(--primary-color);
     }
-    
+
     button {
       background: var(--primary-color);
       color: white;
@@ -147,32 +156,35 @@
       display: flex;
       align-items: center;
       gap: 8px;
+      padding: 12px 20px;
     }
-    
+
     button:hover:not(:disabled) {
-      background: #2980b9;
+      background: var(--primary-dark);
       transform: translateY(-1px);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     }
-    
+
     button:disabled {
       background: #bdc3c7;
       cursor: not-allowed;
       transform: none;
+      box-shadow: none;
     }
-    
+
     .switch {
       position: relative;
       display: inline-block;
       width: 50px;
       height: 24px;
     }
-    
+
     .switch input {
       opacity: 0;
       width: 0;
       height: 0;
     }
-    
+
     .slider {
       position: absolute;
       cursor: pointer;
@@ -184,7 +196,7 @@
       transition: .4s;
       border-radius: 24px;
     }
-    
+
     .slider:before {
       position: absolute;
       content: "";
@@ -196,21 +208,21 @@
       transition: .4s;
       border-radius: 50%;
     }
-    
+
     input:checked + .slider {
       background-color: var(--success-color);
     }
-    
+
     input:checked + .slider:before {
       transform: translateX(26px);
     }
-    
+
     .toggle-container {
       display: flex;
       align-items: center;
       gap: 10px;
     }
-    
+
     .status {
       color: #7f8c8d;
       font-size: 14px;
@@ -218,11 +230,17 @@
       align-items: center;
       gap: 5px;
     }
-    
+
     .result-container {
       display: none;
+      animation: fadeIn 0.5s ease-in-out;
     }
-    
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
     .result-header {
       display: flex;
       justify-content: space-between;
@@ -231,12 +249,15 @@
       padding-bottom: 10px;
       border-bottom: 2px solid var(--border-color);
     }
-    
+
     .result-header h3 {
       color: var(--secondary-color);
       font-size: 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
     }
-    
+
     .result-content {
       background: var(--light-bg);
       padding: 20px;
@@ -246,13 +267,16 @@
       line-height: 1.7;
       border-left: 4px solid var(--primary-color);
     }
-    
+
     .retrievals-section h3 {
       color: var(--secondary-color);
       margin: 25px 0 15px 0;
       font-size: 18px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
     }
-    
+
     .retrieval {
       background: white;
       padding: 16px;
@@ -260,26 +284,29 @@
       margin-bottom: 12px;
       border-left: 4px solid #3498db;
       box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-      transition: transform 0.2s ease;
+      transition: var(--transition);
     }
-    
+
     .retrieval:hover {
       transform: translateX(5px);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
     }
-    
+
     .retrieval-meta {
       color: #666;
       font-size: 14px;
       margin-bottom: 8px;
       padding-bottom: 5px;
       border-bottom: 1px solid var(--border-color);
+      display: flex;
+      justify-content: space-between;
     }
-    
+
     .retrieval-text {
       color: #333;
       line-height: 1.6;
     }
-    
+
     .thinking-badge {
       display: inline-block;
       padding: 4px 8px;
@@ -290,23 +317,47 @@
       font-weight: bold;
       margin-left: 10px;
     }
-    
+
+    .source-info {
+      font-weight: 500;
+    }
+
+    .score-info {
+      background: rgba(52, 152, 219, 0.1);
+      padding: 2px 8px;
+      border-radius: 12px;
+      font-size: 12px;
+    }
+
+    .spinner {
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
     @media (max-width: 768px) {
       .controls {
         flex-direction: column;
         align-items: stretch;
       }
-      
+
       .control-item {
         width: 100%;
       }
-      
+
       body {
         padding: 10px;
       }
-      
+
       .card {
         padding: 20px;
+      }
+      
+      .header h1 {
+        font-size: 24px;
       }
     }
   </style>
@@ -326,16 +377,16 @@
 
       <div class="controls">
         <div class="control-item">
-          <label for="topk">检索数量</label>
+          <label for="topk"><i class="fas fa-list-ol"></i> 检索数量</label>
           <select id="topk">
             <option value="1">1</option>
             <option value="3" selected>3</option>
             <option value="5">5</option>
           </select>
         </div>
-        
+
         <div class="control-item">
-          <label for="modelToggle">深度思考</label>
+          <label for="modelToggle"><i class="fas fa-brain"></i> 思考模式</label>
           <div class="toggle-container">
             <label class="switch">
               <input type="checkbox" id="modelToggle">
@@ -344,11 +395,11 @@
             <span id="modelLabel">基础模式</span>
           </div>
         </div>
-        
+
         <button id="askBtn">
           <i class="fas fa-paper-plane"></i> 提交问题
         </button>
-        
+
         <div id="status" class="status">
           <i class="fas fa-check-circle"></i> 就绪
         </div>
@@ -402,7 +453,7 @@
       const model = useReasoner ? "deepseek-reasoner" : "deepseek-chat"; // Model to use
 
       // UI updates
-      statusEl.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 请求中…';
+      statusEl.innerHTML = '<i class="fas fa-spinner fa-spin spinner"></i> 请求中…';
       statusEl.style.color = '#f39c12';
       askBtn.disabled = true;
       answerArea.style.display = 'none';
@@ -413,8 +464,8 @@
         const resp = await fetch('/ask', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ 
-            question, 
+          body: JSON.stringify({
+            question,
             top_k,
             model  // Add model parameter to the request
           })
@@ -426,25 +477,35 @@
         }
 
         const data = await resp.json();
-        
+
         // Update answer
         answerEl.textContent = data.answer || '(无回答)';
-        
+
         // Update retrievals
         if (Array.isArray(data.retrievals)) {
           retrievalsEl.innerHTML = '';
           data.retrievals.forEach((r, i) => {
             const div = document.createElement('div');
             div.className = 'retrieval';
-            
+
             const meta = document.createElement('div');
             meta.className = 'retrieval-meta';
-            meta.textContent = `${i+1}. ${r.source || '未知来源'} ${r.article_no ? '| ' + r.article_no : ''} (相关度: ${r.score !== null && r.score !== undefined ? Number(r.score).toFixed(3) : 'N/A'})`;
             
+            const sourceInfo = document.createElement('span');
+            sourceInfo.className = 'source-info';
+            sourceInfo.textContent = `${i+1}. ${r.source || '未知来源'}${r.article_no ? ' | ' + r.article_no : ''}`;
+            
+            const scoreInfo = document.createElement('span');
+            scoreInfo.className = 'score-info';
+            scoreInfo.textContent = `相关度: ${r.score !== null && r.score !== undefined ? Number(r.score).toFixed(3) : 'N/A'}`;
+            
+            meta.appendChild(sourceInfo);
+            meta.appendChild(scoreInfo);
+
             const textp = document.createElement('div');
             textp.className = 'retrieval-text';
             textp.textContent = r.text || '';
-            
+
             div.appendChild(meta);
             div.appendChild(textp);
             retrievalsEl.appendChild(div);
