@@ -92,11 +92,19 @@ def get_history(request):
 
         history_data = []
         for h in history:
+            source_info_data = h.source_info
+            # 确保 source_info 是一个字典
+            if isinstance(source_info_data, str):
+                try:
+                    source_info_data = json.loads(source_info_data)
+                except json.JSONDecodeError:
+                    source_info_data = {}  # 如果解析失败，则使用空字典
+
             history_data.append({
                 'id': h.id,
                 'question': h.question,
                 'answer': h.answer,
-                'source_info': h.source_info,
+                'retrievals': source_info_data.get('retrievals', []),  # 提取retrievals
                 'created_at': h.created_at.isoformat(),
             })
 

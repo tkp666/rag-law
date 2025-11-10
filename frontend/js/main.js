@@ -274,7 +274,7 @@ function loadHistoryItem(item) {
   answerEl.textContent = item.answer;
 
   // 清空之前的检索结果并填充新的
-  if (Array.isArray(item.retrievals)) {
+  if (Array.isArray(item.retrievals) && item.retrievals.length > 0) {
     retrievalsEl.innerHTML = '';
     item.retrievals.forEach((r, i) => {
       const div = document.createElement('div');
@@ -303,8 +303,8 @@ function loadHistoryItem(item) {
       retrievalsEl.appendChild(div);
     });
   } else {
-    // 如果历史记录没有检索结果，清空检索区域
-    retrievalsEl.innerHTML = '';
+    // 如果历史记录没有检索结果，显示提示信息
+    retrievalsEl.innerHTML = '<p class="no-retrievals-message">无检索到的法条依据</p>';
   }
 
   // 显示答案区域
@@ -319,6 +319,12 @@ async function deleteHistoryItem(id, event) {
     return;
   }
 
+  // 在删除前，获取该历史记录项的 DOM 元素及其问题内容
+  const historyItemElement = document.querySelector(`.history-item[data-id='${id}']`);
+  const questionOfItemToDelete = historyItemElement 
+    ? historyItemElement.querySelector('.history-question').textContent 
+    : null;
+
   try {
     const response = await fetch(`/history/${id}/delete`, {
       method: 'POST',
@@ -331,6 +337,14 @@ async function deleteHistoryItem(id, event) {
 
     if (!response.ok) {
       throw new Error(`删除失败 ${response.status}`);
+    }
+
+    // 如果当前显示的就是被删除的记录，则清空主界面
+    if (questionOfItemToDelete && qEl.value === questionOfItemToDelete) {
+      qEl.value = '';
+      answerEl.textContent = '';
+      retrievalsEl.innerHTML = '';
+      answerArea.style.display = 'none';
     }
 
     // 删除成功后刷新历史记录
