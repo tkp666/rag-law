@@ -2,7 +2,7 @@
 *.pdf
 
 # 忽略所有 .sqlite3 文件
-*.sqlite3
+chroma_db/*.sqlite3
 
 # 如果需要，也可以忽略特定目录下的这些文件
 # database/*.sqlite3
